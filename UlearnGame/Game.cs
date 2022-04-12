@@ -57,8 +57,12 @@ namespace UlearnGame
 
             var position = LastCirclePosition.PSumm(diff);
             foreach (var wall in Walls)
-                if (Geometry.IsLineCrossed(wall, LastCirclePosition, position))
+                if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) || Geometry.GetDistanceToSegment(wall, position) < 20)
+                {
                     return offset;
+                }
+
+                    
 
             var resOff = offset.PDiff(diff);
             var angleInDegrees = (float)(angle / Math.PI * 180) + 90;
