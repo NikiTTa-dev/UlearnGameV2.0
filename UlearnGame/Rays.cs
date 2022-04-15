@@ -65,7 +65,7 @@ namespace UlearnGame
             FillRaysList();
 
             timer = new Timer();
-            timer.Interval = 3000;
+            timer.Interval = 2000;
             timer.Tick += (sender, e) =>
             {
                 game.CharacterRayCircles.Dequeue();

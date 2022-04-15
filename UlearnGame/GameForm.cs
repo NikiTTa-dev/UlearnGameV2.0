@@ -12,11 +12,13 @@ namespace UlearnGame
 {
     public partial class GameForm : Form
     {
-        public PointF Center { get; set; }
-        public PointF Offset { get; set; }
+        PointF Center { get; set; }
+        PointF Offset { get; set; }
         Game game { get; }
-        PictureBox PictureBox { get; }
-        Timer PaintTimer { get; }
+        PictureBox PictureBox { get; set; }
+        Button StartButton { get; set; }
+        Button ExitButton { get; set; }
+        Timer PaintTimer { get; set; }
         Timer ClickTimer { get; set; }
         Timer ClickIntervalTimer { get; set; }
         Bitmap SmallFeet { get; } = Resources.feetsmall;
@@ -24,7 +26,8 @@ namespace UlearnGame
         bool IsFeetFlipped { get; set; }
         bool IsMouseDown { get; set; }
         bool IsStepped { get; set; }
-
+        bool IsGameStarted { get; set; }
+        bool IsWallsVisualized { get; set; } = true;
 
         public GameForm(Game game)
         {
@@ -36,10 +39,55 @@ namespace UlearnGame
             Center = new PointF(Width / 2, Height / 2);
             Offset = new PointF(0, 0);
 
+            SetTimers();
+
+            Setbuttons();
+
+            this.KeyDown += GameForm_KeyDown;
+        }
+
+        private void GameForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.O:
+                    IsWallsVisualized = !IsWallsVisualized;
+                    break;
+            }
+        }
+
+        private void Setbuttons()
+        {
+            StartButton = new Button();
+            StartButton.Text = "START!";
+            StartButton.Font = new Font(StartButton.Font.Name, 16);
+            StartButton.ForeColor = Color.White;
+            StartButton.Size = new Size(100, 50);
+            StartButton.Location = new Point((int)Center.X - StartButton.Width / 2,
+                (int)Center.Y - 100);
+            StartButton.TabStop = false;
+            StartButton.Click += StartGame;
+
+            Controls.Add(StartButton);
+
+            ExitButton = new Button();
+            ExitButton.Text = "EXIT!";
+            ExitButton.Font = new Font(ExitButton.Font.Name, 16);
+            ExitButton.ForeColor = Color.White;
+            ExitButton.Size = new Size(100, 50);
+            ExitButton.Location = new Point((int)Center.X - ExitButton.Width / 2,
+                (int)Center.Y);
+            ExitButton.TabStop = false;
+            ExitButton.Click += ExitButton_Click;
+
+            Controls.Add(ExitButton);
+        }
+
+        private void SetTimers()
+        {
             PaintTimer = new Timer();
-            PaintTimer.Interval = 20;
+            PaintTimer.Interval = 10;
             PaintTimer.Tick += PaintTimer_Tick;
-            PaintTimer.Start();
 
             ClickIntervalTimer = new Timer();
             ClickIntervalTimer.Interval = 600;
@@ -48,7 +96,11 @@ namespace UlearnGame
             ClickTimer = new Timer();
             ClickTimer.Interval = 650;
             ClickTimer.Tick += ClickTimer_Tick;
+        }
 
+        private void StartGame(object sender, EventArgs e)
+        {
+            Controls.Clear();
             PictureBox = new PictureBox
             {
                 Location = new Point(0, 0),
@@ -56,21 +108,32 @@ namespace UlearnGame
                 Height = this.Height
             };
             PictureBox.Paint += PB_OnPaint;
+            PaintTimer.Start();
             PictureBox.MouseDown += PB_MouseDown;
             PictureBox.MouseUp += PB_MouseUp;
             PictureBox.MouseMove += PB_MouseMove;
             Controls.Add(PictureBox);
-            
             Offset = game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
+            IsGameStarted = true;
+        }
+
+        private void ExitButton_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            foreach (var rayCircle in game.CharacterRayCircles)
+            if (IsGameStarted)
             {
-                DrawRays(g, rayCircle);
-                DrawFeet(g, rayCircle);
+                foreach (var rayCircle in game.CharacterRayCircles)
+                {
+                    DrawRays(g, rayCircle);
+                    DrawFeet(g, rayCircle);
+                }
+                if (IsWallsVisualized)
+                    VisualizeWalls(g);
             }
         }
 
@@ -111,6 +174,12 @@ namespace UlearnGame
                 g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.Color)),
                     ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
             }
+        }
+
+        private void VisualizeWalls(Graphics g)
+        {
+            foreach (var wall in game.Walls)
+                g.DrawLine(new Pen(Color.Red, 2), wall.First.PSumm(Offset), wall.Last.PSumm(Offset));
         }
 
         private void PaintTimer_Tick(object sender, EventArgs e)

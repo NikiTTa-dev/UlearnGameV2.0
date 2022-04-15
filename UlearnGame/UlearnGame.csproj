@@ -62,7 +62,7 @@
     </Compile>
     <Compile Include="Geometry.cs" />
     <Compile Include="IGameObject.cs" />
-    <Compile Include="MakeTestScene.cs" />
+    <Compile Include="Scenes\MakeTestScene.cs" />
     <Compile Include="PointFExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,6 +72,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="IScene.cs" />
+    <Compile Include="Scenes\MenuScene.cs" />
+    <Compile Include="Scenes\TestScene.cs" />
     <Compile Include="SomeTests.cs" />
     <Compile Include="Wall.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

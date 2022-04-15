@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Windows.Forms;
 
 //TODO:
-//stop in front of wall
 //SceneManagement
 //Tests
 //Tutorial
@@ -24,6 +23,7 @@ namespace UlearnGame
         public bool IsMouseDown { get; set; }
         public int StepLength { get; set; } = 125;
         public PointF LastCirclePosition { get; set; }
+        int closeToWallDistance = 30;
 
         public Game()
         {
@@ -46,23 +46,16 @@ namespace UlearnGame
             double angle = Math.Atan2(MouseLocation.Y - center.Y, MouseLocation.X - center.X);
             PointF diff;
             if (length >= StepLength)
-            {
                 diff = new PointF((float)(StepLength * Math.Cos(angle)),
                     (float)(StepLength * Math.Sin(angle)));
-            }
             else
-            {
                 diff = MouseLocation.PDiff(center);
-            }
 
             var position = LastCirclePosition.PSumm(diff);
             foreach (var wall in Walls)
-                if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) || Geometry.GetDistanceToSegment(wall, position) < 20)
-                {
+                if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) ||
+                    Geometry.GetDistanceToSegment(wall, position) < closeToWallDistance)
                     return offset;
-                }
-
-                    
 
             var resOff = offset.PDiff(diff);
             var angleInDegrees = (float)(angle / Math.PI * 180) + 90;
@@ -86,7 +79,7 @@ namespace UlearnGame
                             ray.RayParts.Add(new PointF(ray.Position.X, ray.Position.Y));
                         }
                     ray.LengthenRay();
-                    ray.Opacity = (int)(ray.Opacity * 0.975);
+                    ray.Opacity = (int)(ray.Opacity * 0.98);
                 }
             }
         }
