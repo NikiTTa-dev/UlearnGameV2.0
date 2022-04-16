@@ -45,7 +45,7 @@ namespace UlearnGame
 
     public class RayCircle : IGameObject
     {
-        private readonly Timer timer;
+        public readonly Timer DestroyTimer;
         public Color Color { get; set; } = Color.White;
         public int Speed { get; set; } = 5;
         public int Radius { get; set; } = 20;
@@ -64,14 +64,14 @@ namespace UlearnGame
             Rays = new List<Ray>();
             FillRaysList();
 
-            timer = new Timer();
-            timer.Interval = 2000;
-            timer.Tick += (sender, e) =>
+            DestroyTimer = new Timer();
+            DestroyTimer.Interval = 2000;
+            DestroyTimer.Tick += (sender, e) =>
             {
                 game.CharacterRayCircles.Dequeue();
-                timer.Stop();
+                DestroyTimer.Stop();
             };
-            timer.Start();
+            DestroyTimer.Start();
         }
 
         private void FillRaysList()

@@ -17,6 +17,7 @@ namespace UlearnGame
         Game game { get; }
         PictureBox PictureBox { get; set; }
         Button StartButton { get; set; }
+        Button ContinueButton { get; set; }
         Button ExitButton { get; set; }
         Timer PaintTimer { get; set; }
         Timer ClickTimer { get; set; }
@@ -27,6 +28,7 @@ namespace UlearnGame
         bool IsMouseDown { get; set; }
         bool IsStepped { get; set; }
         bool IsGameStarted { get; set; }
+        bool IsGamePaused { get; set; }
         bool IsWallsVisualized { get; set; } = true;
 
         public GameForm(Game game)
@@ -52,6 +54,12 @@ namespace UlearnGame
             {
                 case Keys.O:
                     IsWallsVisualized = !IsWallsVisualized;
+                    break;
+                case Keys.Escape:
+                    if (IsGameStarted && !IsGamePaused)
+                        PauseGame();
+                    else if (IsGameStarted)
+                        UnpauseGame();
                     break;
             }
         }
@@ -81,6 +89,16 @@ namespace UlearnGame
             ExitButton.Click += ExitButton_Click;
 
             Controls.Add(ExitButton);
+
+            ContinueButton = new Button();
+            ContinueButton.Text = "CONTINUE!";
+            ContinueButton.Font = new Font(ContinueButton.Font.Name, 16);
+            ContinueButton.ForeColor = Color.White;
+            ContinueButton.Size = new Size(170, 50);
+            ContinueButton.Location = new Point((int)Center.X - ContinueButton.Width / 2,
+                (int)Center.Y - 100);
+            ContinueButton.TabStop = false;
+            ContinueButton.Click += ContinueButton_Click;
         }
 
         private void SetTimers()
@@ -117,9 +135,35 @@ namespace UlearnGame
             IsGameStarted = true;
         }
 
+        private void UnpauseGame()
+        {
+            Controls.Clear();
+            Controls.Add(PictureBox);
+            IsGamePaused = false;
+            PaintTimer.Start();
+            foreach (var rayCircle in game.CharacterRayCircles)
+                rayCircle.DestroyTimer.Start();
+        }
+
+        private void PauseGame()
+        {
+            Controls.Clear();
+            PaintTimer.Stop();
+            foreach (var rayCircle in game.CharacterRayCircles)
+                rayCircle.DestroyTimer.Stop();
+            Controls.Add(ExitButton);
+            Controls.Add(ContinueButton);
+            IsGamePaused = true;
+        }
+
         private void ExitButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void ContinueButton_Click(object sender, EventArgs e)
+        {
+            UnpauseGame();
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -199,12 +243,6 @@ namespace UlearnGame
             EnqueRCircle();
         }
 
-        private void PB_MouseUp(object sender, MouseEventArgs e)
-        {
-            IsMouseDown = false;
-            ClickTimer.Stop();
-        }
-
         private void PB_MouseDown(object sender, MouseEventArgs e)
         {
             game.MouseLocation = new PointF(e.Location.X, e.Location.Y);
@@ -218,6 +256,12 @@ namespace UlearnGame
         {
             if (IsMouseDown)
                 game.MouseLocation = new PointF(e.Location.X, e.Location.Y);
+        }
+
+        private void PB_MouseUp(object sender, MouseEventArgs e)
+        {
+            IsMouseDown = false;
+            ClickTimer.Stop();
         }
 
         private void EnqueRCircle()

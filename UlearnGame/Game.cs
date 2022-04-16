@@ -79,7 +79,7 @@ namespace UlearnGame
                             ray.RayParts.Add(new PointF(ray.Position.X, ray.Position.Y));
                         }
                     ray.LengthenRay();
-                    ray.Opacity = (int)(ray.Opacity * 0.98);
+                    ray.Opacity = (int)(ray.Opacity * 0.985);
                 }
             }
         }
