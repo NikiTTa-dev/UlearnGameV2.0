@@ -10,26 +10,25 @@ using System.Windows.Forms;
 //SceneManagement
 //Tests
 //Tutorial
-//Menu
-//Pause
 
 namespace UlearnGame
 {
     public class Game
     {
         public Queue<RayCircle> CharacterRayCircles { get; set; }
+        public WinningScuare winningScuare { get; set; }
         public List<Wall> Walls { get; set; }
         public PointF MouseLocation { get; set; }
         public bool IsMouseDown { get; set; }
-        public int StepLength { get; set; } = 125;
+        public int StepLength { get; set; } = 130;
         public PointF LastCirclePosition { get; set; }
-        int closeToWallDistance = 30;
+        private int closeToWallDistance { get; set; } = 30;
 
         public Game()
         {
             new MakeTestScene(this);
             CharacterRayCircles = new Queue<RayCircle>();
-            MouseLocation = new PointF();
+            winningScuare = new WinningScuare(new PointF(300, 400));
         }
 
         public PointF EnqueueNewRayCircle(PointF center, PointF offset, bool feetFlip)
@@ -71,16 +70,14 @@ namespace UlearnGame
             {
                 foreach (var ray in rayCircle.Rays)
                 {
-                    foreach (var wall in Walls)
-                        if (Geometry.GetDistanceToSegment(wall, ray.Position) <= ray.Radius &&
-                            Geometry.GetVectorDirection(wall, ray) == RayDirection.ToWall)
-                        {
-                            ray.MotionVector = Geometry.GetCollisionVector(wall, ray);
-                            ray.RayParts.Add(new PointF(ray.Position.X, ray.Position.Y));
-                        }
-                    ray.LengthenRay();
+                    ray.RefreshRay(Walls);
                     ray.Opacity = (int)(ray.Opacity * 0.985);
                 }
+            }
+            foreach (var ray in winningScuare.Rays)
+            {
+                ray.RefreshRay(winningScuare.Walls);
+                ray.Opacity = (int)(ray.Opacity);
             }
         }
     }

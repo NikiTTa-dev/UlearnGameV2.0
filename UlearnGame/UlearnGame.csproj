@@ -75,6 +75,7 @@
     <Compile Include="IScene.cs" />
     <Compile Include="SomeTests.cs" />
     <Compile Include="Wall.cs" />
+    <Compile Include="WinningScuare.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

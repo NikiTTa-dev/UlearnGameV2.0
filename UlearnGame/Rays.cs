@@ -14,13 +14,23 @@ namespace UlearnGame
         FromWall
     }
 
+    class RayPart
+    {
+        public RayPart PrevRayPart { get; set; }
+        public PointF Position { get; set; }
+        public RayPart(RayPart prevPart)
+        {
+            PrevRayPart = prevPart;
+        }
+    }
+
     public class Ray : IGameObject
     {
         public List<PointF> RayParts { get; set; }
         public int Radius { get; set; } = 5;
         public PointF Position { get; set; }
         public PointF MotionVector { get; set; }
-        public Color Color { get; set; }
+        public Color ObjectColor { get; set; }
         public int Opacity { get; set; } = 255;
         public int Speed { get; set; }
 
@@ -29,10 +39,8 @@ namespace UlearnGame
             Speed = speed;
             Position = pos;
             MotionVector = motionV;
-            Color = color;
-            RayParts = new List<PointF>();
-            RayParts.Add(pos);
-            RayParts.Add(pos);
+            ObjectColor = color;
+            RayParts = new List<PointF> { pos, pos };
         }
 
         public void LengthenRay()
@@ -41,12 +49,24 @@ namespace UlearnGame
             Position = newPos;
             RayParts[RayParts.Count - 1] = newPos;
         }
+
+        public void RefreshRay(List<Wall> Walls)
+        {
+            foreach (var wall in Walls)
+                if (Geometry.GetDistanceToSegment(wall, Position) <= Radius &&
+                    Geometry.GetVectorDirection(wall, this) == RayDirection.ToWall)
+                {
+                    MotionVector = Geometry.GetCollisionVector(wall, this);
+                    RayParts.Add(Position);
+                }
+            LengthenRay();
+        }
     }
 
     public class RayCircle : IGameObject
     {
         public readonly Timer DestroyTimer;
-        public Color Color { get; set; } = Color.White;
+        public Color ObjectColor { get; set; } = Color.White;
         public int Speed { get; set; } = 5;
         public int Radius { get; set; } = 20;
         public int RaysCount { get; set; } = 24;
@@ -82,7 +102,7 @@ namespace UlearnGame
                 PointF position = new PointF((float)(Position.X + Radius * Math.Cos(angle)),
                     (float)(Position.Y + Radius * Math.Sin(angle)));
                 PointF motionV = new PointF((float)(Speed * Math.Cos(angle)), (float)(Speed * Math.Sin(angle)));
-                Rays.Add(new Ray(Speed, position, motionV, Color));
+                Rays.Add(new Ray(Speed, position, motionV, ObjectColor));
             }
         }
     }

@@ -178,6 +178,15 @@ namespace UlearnGame
                 }
                 if (IsWallsVisualized)
                     VisualizeWalls(g);
+                foreach(var ray in game.winningScuare.Rays)
+                {
+                    for (int i = Math.Max(ray.RayParts.Count - 4, 1); i < ray.RayParts.Count; i++)
+                        g.DrawLine(new Pen(Color.FromArgb(ray.Opacity, ray.ObjectColor), ray.Radius * 2),
+                            ray.RayParts[i - 1].PSumm(Offset), ray.RayParts[i].PSumm(Offset));
+                    g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.ObjectColor)),
+                        ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
+                }
+
             }
         }
 
@@ -213,9 +222,9 @@ namespace UlearnGame
             foreach (var ray in rayCircle.Rays)
             {
                 for (int i = 1; i < ray.RayParts.Count; i++)
-                    g.DrawLine(new Pen(Color.FromArgb(ray.Opacity, ray.Color), ray.Radius * 2),
+                    g.DrawLine(new Pen(Color.FromArgb(ray.Opacity, ray.ObjectColor), ray.Radius * 2),
                         ray.RayParts[i - 1].PSumm(Offset), ray.RayParts[i].PSumm(Offset));
-                g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.Color)),
+                g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.ObjectColor)),
                     ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
             }
         }

@@ -10,7 +10,7 @@ namespace UlearnGame
     interface IGameObject
     {
         PointF Position { get; set; }
-        Color Color { get; set; }
+        Color ObjectColor { get; set; }
         int Speed { get; set; }
     }
 }
