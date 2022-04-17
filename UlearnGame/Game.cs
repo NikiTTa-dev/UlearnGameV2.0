@@ -76,8 +76,7 @@ namespace UlearnGame
             }
             foreach (var ray in winningScuare.Rays)
             {
-                ray.RefreshRay(winningScuare.Walls);
-                ray.Opacity = (int)(ray.Opacity);
+                ray.RefreshWinningRays(winningScuare.Walls);
             }
         }
     }

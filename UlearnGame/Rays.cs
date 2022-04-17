@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -14,19 +13,23 @@ namespace UlearnGame
         FromWall
     }
 
-    class RayPart
+    public class RayPart
     {
+        public int Opacity { get; set; }
         public RayPart PrevRayPart { get; set; }
         public PointF Position { get; set; }
-        public RayPart(RayPart prevPart)
+        public RayPart(RayPart prevPart, PointF position, int opacity)
         {
+            Opacity = opacity;
             PrevRayPart = prevPart;
+            Position = position;
         }
     }
 
     public class Ray : IGameObject
     {
-        public List<PointF> RayParts { get; set; }
+        public RayPart LastRayPart {get; set; }
+        public Queue<RayPart> RayParts { get; set; }
         public int Radius { get; set; } = 5;
         public PointF Position { get; set; }
         public PointF MotionVector { get; set; }
@@ -40,26 +43,39 @@ namespace UlearnGame
             Position = pos;
             MotionVector = motionV;
             ObjectColor = color;
-            RayParts = new List<PointF> { pos, pos };
+            RayParts = new Queue<RayPart>();
+            LastRayPart = new RayPart(null, pos, Opacity);
+            RayParts.Enqueue(LastRayPart);
+            
         }
 
         public void LengthenRay()
         {
-            var newPos = new PointF(Position.X + MotionVector.X, Position.Y + MotionVector.Y);
-            Position = newPos;
-            RayParts[RayParts.Count - 1] = newPos;
+            Position = Position.PSumm(MotionVector);
         }
 
-        public void RefreshRay(List<Wall> Walls)
+        public void RefreshRay(List<Wall> walls)
         {
-            foreach (var wall in Walls)
+            foreach (var wall in walls)
                 if (Geometry.GetDistanceToSegment(wall, Position) <= Radius &&
                     Geometry.GetVectorDirection(wall, this) == RayDirection.ToWall)
                 {
                     MotionVector = Geometry.GetCollisionVector(wall, this);
-                    RayParts.Add(Position);
+                    LastRayPart = new RayPart(LastRayPart, Position, Opacity);
+                    RayParts.Enqueue(LastRayPart);
                 }
             LengthenRay();
+        }
+
+        public void RefreshWinningRays(List<Wall> walls)
+        {
+            RefreshRay(walls);
+            if (RayParts.Count > 5)
+            {
+                RayParts.Dequeue();
+                foreach (var rayPart in RayParts)
+                    rayPart.Opacity = (int)(rayPart.Opacity * 0.7);
+            }
         }
     }
 

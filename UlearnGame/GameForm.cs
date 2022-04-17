@@ -173,20 +173,14 @@ namespace UlearnGame
             {
                 foreach (var rayCircle in game.CharacterRayCircles)
                 {
-                    DrawRays(g, rayCircle);
+                    foreach (var ray in rayCircle.Rays)
+                        DrawRay(g, ray);
                     DrawFeet(g, rayCircle);
                 }
+                foreach (var ray in game.winningScuare.Rays)
+                    DrawRay(g, ray);
                 if (IsWallsVisualized)
                     VisualizeWalls(g);
-                foreach(var ray in game.winningScuare.Rays)
-                {
-                    for (int i = Math.Max(ray.RayParts.Count - 4, 1); i < ray.RayParts.Count; i++)
-                        g.DrawLine(new Pen(Color.FromArgb(ray.Opacity, ray.ObjectColor), ray.Radius * 2),
-                            ray.RayParts[i - 1].PSumm(Offset), ray.RayParts[i].PSumm(Offset));
-                    g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.ObjectColor)),
-                        ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
-                }
-
             }
         }
 
@@ -217,16 +211,22 @@ namespace UlearnGame
             g.TranslateTransform(-x, -y);
         }
 
-        private void DrawRays(Graphics g, RayCircle rayCircle)
+        private void DrawRay(Graphics g, Ray ray)
         {
-            foreach (var ray in rayCircle.Rays)
-            {
-                for (int i = 1; i < ray.RayParts.Count; i++)
-                    g.DrawLine(new Pen(Color.FromArgb(ray.Opacity, ray.ObjectColor), ray.Radius * 2),
-                        ray.RayParts[i - 1].PSumm(Offset), ray.RayParts[i].PSumm(Offset));
-                g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.ObjectColor)),
-                    ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
-            }
+            foreach (var rayPart in ray.RayParts)
+                if (rayPart.PrevRayPart != null)
+                    DrawRayPart(g, ray, rayPart.PrevRayPart.Position.PSumm(Offset), rayPart.Position.PSumm(Offset), rayPart.Opacity);
+            DrawRayPart(g, ray, ray.LastRayPart.Position.PSumm(Offset), ray.Position.PSumm(Offset), ray.Opacity);
+            g.FillEllipse(new SolidBrush(Color.FromArgb(ray.Opacity, ray.ObjectColor)),
+                ray.Position.X - ray.Radius + Offset.X, ray.Position.Y - ray.Radius + Offset.Y, 2 * ray.Radius, 2 * ray.Radius);
+        }
+
+        private void DrawRayPart(Graphics g, Ray ray, PointF first, PointF second, int opacity)
+        {
+            g.DrawLine(
+                new Pen(Color.FromArgb(opacity, ray.ObjectColor), ray.Radius * 2),
+                first,
+                second);
         }
 
         private void VisualizeWalls(Graphics g)
