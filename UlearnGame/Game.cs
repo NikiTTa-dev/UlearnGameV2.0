@@ -20,6 +20,7 @@ namespace UlearnGame
         public List<Wall> Walls { get; set; }
         public PointF MouseLocation { get; set; }
         public bool IsMouseDown { get; set; }
+        public bool IsGameWon { get; set; }
         public int StepLength { get; set; } = 130;
         public PointF LastCirclePosition { get; set; }
         private int closeToWallDistance { get; set; } = 30;
@@ -28,7 +29,6 @@ namespace UlearnGame
         {
             new MakeTestScene(this);
             CharacterRayCircles = new Queue<RayCircle>();
-            winningScuare = new WinningScuare(new PointF(300, 400));
         }
 
         public PointF EnqueueNewRayCircle(PointF center, PointF offset, bool feetFlip)
@@ -51,6 +51,15 @@ namespace UlearnGame
                 diff = MouseLocation.PDiff(center);
 
             var position = LastCirclePosition.PSumm(diff);
+
+            foreach (var wall in winningScuare.Walls)
+            {
+                if (Geometry.IsLineCrossed(wall, LastCirclePosition, position))
+                {
+                    WinLevel();
+                }
+            }
+
             foreach (var wall in Walls)
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) ||
                     Geometry.GetDistanceToSegment(wall, position) < closeToWallDistance)
@@ -62,6 +71,11 @@ namespace UlearnGame
             LastCirclePosition = newRayCircle.Position;
             CharacterRayCircles.Enqueue(newRayCircle);
             return resOff;
+        }
+
+        private void WinLevel()
+        {
+            IsGameWon = true;
         }
 
         public void Refresh()

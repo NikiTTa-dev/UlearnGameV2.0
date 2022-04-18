@@ -14,13 +14,17 @@ namespace UlearnGame
             game.Walls = new List<Wall>
             {
                 new Wall(new PointF(0, 100), new PointF(1080, 100)),
-                new Wall(new PointF(100, 0), new PointF(100, 720)),
-                new Wall(new PointF(980, 0), new PointF(980, 260)),
-                new Wall(new PointF(980, 460), new PointF(980, 720)),
-                new Wall(new PointF(0, 620), new PointF(1080, 620)),
-                new Wall(new PointF(0, 360), new PointF(540, 720))
+                new Wall(new PointF(1080, 100), new PointF(1080, 300)),
+                new Wall(new PointF(0, 100), new PointF(0, 500)),
+                new Wall(new PointF(0, 500), new PointF(540, 720)),
+                new Wall(new PointF(540, 720), new PointF(1080, 720)),
+                new Wall(new PointF(1080, 720), new PointF(1080, 550)),
+                new Wall(new PointF(1080, 550), new PointF(1330, 550)),
+                new Wall(new PointF(1330, 550), new PointF(1330, 300)),
+                new Wall(new PointF(1330, 300), new PointF(1080, 300)),
 
             };
+            game.winningScuare = new WinningScuare(new PointF(1080, 300));
         }
     }
 }

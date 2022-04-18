@@ -156,6 +156,13 @@ namespace UlearnGame
             IsGamePaused = true;
         }
 
+        private void ShowWinningScreen()
+        {
+            Controls.Clear();
+            Controls.Add(ExitButton);
+            PaintTimer.Stop();
+        }
+
         private void ExitButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -237,8 +244,15 @@ namespace UlearnGame
 
         private void PaintTimer_Tick(object sender, EventArgs e)
         {
-            game.Refresh();
-            PictureBox.Invalidate();
+            if (!game.IsGameWon)
+            {
+                game.Refresh();
+                PictureBox.Invalidate();
+            }
+            else
+            {
+                ShowWinningScreen();
+            }
         }
 
         private void ClickIntervalTimer_Tick(object sender, EventArgs e)
