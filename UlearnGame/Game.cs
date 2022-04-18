@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.Windows.Forms;
 
 //TODO:
 //SceneManagement
@@ -76,6 +72,11 @@ namespace UlearnGame
         private void WinLevel()
         {
             IsGameWon = true;
+            LastCirclePosition = PointF.Empty;
+            new MakeTestScene(this);
+            foreach (var rayCircle in CharacterRayCircles) 
+                rayCircle.DestroyTimer.Stop();
+            CharacterRayCircles.Clear();
         }
 
         public void Refresh()

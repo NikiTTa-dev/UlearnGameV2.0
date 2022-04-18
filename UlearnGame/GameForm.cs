@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace UlearnGame
@@ -18,6 +12,7 @@ namespace UlearnGame
         PictureBox PictureBox { get; set; }
         Button StartButton { get; set; }
         Button ContinueButton { get; set; }
+        Button NextLevelButton { get; set; }
         Button ExitButton { get; set; }
         Timer PaintTimer { get; set; }
         Timer ClickTimer { get; set; }
@@ -99,6 +94,16 @@ namespace UlearnGame
                 (int)Center.Y - 100);
             ContinueButton.TabStop = false;
             ContinueButton.Click += ContinueButton_Click;
+
+            NextLevelButton = new Button();
+            NextLevelButton.Text = "NEXT LEVEL!";
+            NextLevelButton.Font = new Font(NextLevelButton.Font.Name, 16);
+            NextLevelButton.ForeColor = Color.White;
+            NextLevelButton.Size = new Size(170, 50);
+            NextLevelButton.Location = new Point((int)Center.X - NextLevelButton.Width / 2,
+                (int)Center.Y - 100);
+            NextLevelButton.TabStop = false;
+            NextLevelButton.Click += NextLevelButton_Click;
         }
 
         private void SetTimers()
@@ -131,7 +136,7 @@ namespace UlearnGame
             PictureBox.MouseUp += PB_MouseUp;
             PictureBox.MouseMove += PB_MouseMove;
             Controls.Add(PictureBox);
-            Offset = game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
+            game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
             IsGameStarted = true;
         }
 
@@ -160,6 +165,7 @@ namespace UlearnGame
         {
             Controls.Clear();
             Controls.Add(ExitButton);
+            Controls.Add(NextLevelButton);
             PaintTimer.Stop();
         }
 
@@ -171,6 +177,15 @@ namespace UlearnGame
         private void ContinueButton_Click(object sender, EventArgs e)
         {
             UnpauseGame();
+        }
+
+        private void NextLevelButton_Click(object sender, EventArgs e)
+        {
+            game.IsGameWon = false;
+            Controls.Clear();
+            Controls.Add(PictureBox);
+            PaintTimer.Start();
+            game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -251,6 +266,8 @@ namespace UlearnGame
             }
             else
             {
+                Offset = new PointF(0, 0);
+                IsFeetFlipped = false;
                 ShowWinningScreen();
             }
         }
@@ -263,13 +280,13 @@ namespace UlearnGame
 
         private void ClickTimer_Tick(object sender, EventArgs e)
         {
-            EnqueRCircle();
+            EnqueueRCircle();
         }
 
         private void PB_MouseDown(object sender, MouseEventArgs e)
         {
             game.MouseLocation = new PointF(e.Location.X, e.Location.Y);
-            EnqueRCircle();
+            EnqueueRCircle();
 
             ClickTimer.Start();
             IsMouseDown = true;
@@ -287,7 +304,7 @@ namespace UlearnGame
             ClickTimer.Stop();
         }
 
-        private void EnqueRCircle()
+        private void EnqueueRCircle()
         {
             if (!IsStepped)
             {
