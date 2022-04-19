@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace UlearnGame
 {
-    public interface IScene
+    public class Level
     {
-        List<Wall> Walls { get; set; }
+        public List<Wall> Walls;
+        public PointF WinningSquarePositon;
     }
 }

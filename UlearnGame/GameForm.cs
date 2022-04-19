@@ -10,6 +10,7 @@ namespace UlearnGame
         PointF Offset { get; set; }
         Game game { get; }
         PictureBox PictureBox { get; set; }
+        Label WinningTextBox { get; set; }
         Button StartButton { get; set; }
         Button ContinueButton { get; set; }
         Button NextLevelButton { get; set; }
@@ -29,15 +30,15 @@ namespace UlearnGame
         public GameForm(Game game)
         {
             BackColor = Color.Black;
-            Width = 1080;
-            Height = 720;
+            Width = 1600;
+            Height = 900;
             this.game = game;
             StartPosition = FormStartPosition.CenterScreen;
             Center = new PointF(Width / 2, Height / 2);
             Offset = new PointF(0, 0);
 
             SetTimers();
-
+            SetTextBoxes();
             Setbuttons();
 
             this.KeyDown += GameForm_KeyDown;
@@ -106,6 +107,18 @@ namespace UlearnGame
             NextLevelButton.Click += NextLevelButton_Click;
         }
 
+        private void SetTextBoxes()
+        {
+            WinningTextBox = new Label();
+            WinningTextBox.Text = "YOU ENDED THE GAME!\r\nCONGRATULATIONS!";
+            WinningTextBox.Font = new Font(WinningTextBox.Font.Name, 30);
+            WinningTextBox.ForeColor = Color.White;
+            WinningTextBox.Size = new Size(600, 200);
+            WinningTextBox.Location = new Point((int)Center.X - WinningTextBox.Width / 2,
+                (int)Center.Y - 200);
+            WinningTextBox.TabStop = false;
+        }
+
         private void SetTimers()
         {
             PaintTimer = new Timer();
@@ -164,9 +177,15 @@ namespace UlearnGame
         private void ShowWinningScreen()
         {
             Controls.Clear();
-            Controls.Add(ExitButton);
-            Controls.Add(NextLevelButton);
             PaintTimer.Stop();
+            Controls.Add(ExitButton);
+            if (!game.IsLevelsEnded)
+                Controls.Add(NextLevelButton);
+            else
+            {
+                Controls.Add(WinningTextBox);
+            }
+            
         }
 
         private void ExitButton_Click(object sender, EventArgs e)

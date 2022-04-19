@@ -1,29 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using Newtonsoft.Json;
 
 //TODO:
-//SceneManagement
-//Tests
 //Tutorial
+//RedSquare
 
 namespace UlearnGame
 {
     public class Game
     {
+        private int CurLevel = 0;
+        private List<Level> Levels;
         public Queue<RayCircle> CharacterRayCircles { get; set; }
         public WinningScuare winningScuare { get; set; }
         public List<Wall> Walls { get; set; }
         public PointF MouseLocation { get; set; }
-        public bool IsMouseDown { get; set; }
         public bool IsGameWon { get; set; }
+        public bool IsLevelsEnded { get; set; }
         public int StepLength { get; set; } = 130;
         public PointF LastCirclePosition { get; set; }
         private int closeToWallDistance { get; set; } = 30;
 
         public Game()
         {
-            new MakeTestScene(this);
+            Levels = JsonConvert.DeserializeObject<List<Level>>(File.ReadAllText("Levels.json"));
+            Walls = Levels[CurLevel].Walls;
+            winningScuare = new WinningScuare(Levels[CurLevel].WinningSquarePositon);
             CharacterRayCircles = new Queue<RayCircle>();
         }
 
@@ -73,8 +78,15 @@ namespace UlearnGame
         {
             IsGameWon = true;
             LastCirclePosition = PointF.Empty;
-            new MakeTestScene(this);
-            foreach (var rayCircle in CharacterRayCircles) 
+            CurLevel++;
+            if (CurLevel == Levels.Count)
+            {
+                CurLevel = 0;
+                IsLevelsEnded = true;
+            } 
+            Walls = Levels[CurLevel].Walls;
+            winningScuare = new WinningScuare(Levels[CurLevel].WinningSquarePositon);
+            foreach (var rayCircle in CharacterRayCircles)
                 rayCircle.DestroyTimer.Stop();
             CharacterRayCircles.Clear();
         }
