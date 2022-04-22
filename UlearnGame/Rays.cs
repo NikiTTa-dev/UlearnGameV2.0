@@ -90,8 +90,9 @@ namespace UlearnGame
         public float FeetAngle { get; set; }
         public bool IsFeetFlipped { get; }
 
-        public RayCircle(PointF position, Game game, float feetAngle, bool isFeetFlipped)
+        public RayCircle(PointF position, Game game, float feetAngle, bool isFeetFlipped, string feet)
         {
+            Feet = feet;
             IsFeetFlipped = isFeetFlipped;
             FeetAngle = feetAngle;
             Position = position;

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 //TODO:
 //Tutorial
 //RedSquare
+//Sounds
 
 namespace UlearnGame
 {
@@ -17,12 +18,11 @@ namespace UlearnGame
         public Queue<RayCircle> CharacterRayCircles { get; set; }
         public WinningScuare winningScuare { get; set; }
         public List<Wall> Walls { get; set; }
-        public PointF MouseLocation { get; set; }
         public bool IsGameWon { get; set; }
         public bool IsLevelsEnded { get; set; }
         public int StepLength { get; set; } = 130;
         public PointF LastCirclePosition { get; set; }
-        private int closeToWallDistance { get; set; } = 30;
+        private int CloseToWallDistance { get; set; } = 30;
 
         public Game()
         {
@@ -32,43 +32,38 @@ namespace UlearnGame
             CharacterRayCircles = new Queue<RayCircle>();
         }
 
-        public PointF EnqueueNewRayCircle(PointF center, PointF offset, bool feetFlip)
+        public PointF EnqueueNewRayCircle(PointF location, PointF center, PointF offset, bool feetFlip, string feet = "feetSmall")
         {
             if (LastCirclePosition.IsEmpty)
             {
                 LastCirclePosition = center;
-                CharacterRayCircles.Enqueue(new RayCircle(center, this, 0, feetFlip) { Feet = "feetSmall2" });
+                CharacterRayCircles.Enqueue(new RayCircle(center, this, 0, feetFlip, "feetSmall2"));
                 return offset;
             }
 
-            double length = Math.Sqrt((MouseLocation.X - center.X) * (MouseLocation.X - center.X) +
-                (MouseLocation.Y - center.Y) * (MouseLocation.Y - center.Y));
-            double angle = Math.Atan2(MouseLocation.Y - center.Y, MouseLocation.X - center.X);
+            double length = Math.Sqrt((location.X - center.X) * (location.X - center.X) +
+                (location.Y - center.Y) * (location.Y - center.Y));
+            double angle = Math.Atan2(location.Y - center.Y, location.X - center.X);
             PointF diff;
             if (length >= StepLength)
                 diff = new PointF((float)(StepLength * Math.Cos(angle)),
                     (float)(StepLength * Math.Sin(angle)));
             else
-                diff = MouseLocation.PDiff(center);
+                diff = location.PDiff(center);
 
             var position = LastCirclePosition.PSumm(diff);
-
             foreach (var wall in winningScuare.Walls)
-            {
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position))
-                {
                     WinLevel();
-                }
-            }
-
+                
             foreach (var wall in Walls)
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) ||
-                    Geometry.GetDistanceToSegment(wall, position) < closeToWallDistance)
+                    Geometry.GetDistanceToSegment(wall, position) < CloseToWallDistance)
                     return offset;
 
             var resOff = offset.PDiff(diff);
             var angleInDegrees = (float)(angle / Math.PI * 180) + 90;
-            var newRayCircle = new RayCircle(position, this, angleInDegrees, feetFlip);
+            var newRayCircle = new RayCircle(position, this, angleInDegrees, feetFlip, feet);
             LastCirclePosition = newRayCircle.Position;
             CharacterRayCircles.Enqueue(newRayCircle);
             return resOff;

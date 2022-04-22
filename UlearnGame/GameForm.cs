@@ -8,6 +8,7 @@ namespace UlearnGame
     {
         PointF Center { get; set; }
         PointF Offset { get; set; }
+        PointF MouseLocation { get; set; }
         Game game { get; }
         PictureBox PictureBox { get; set; }
         Label WinningTextBox { get; set; }
@@ -39,7 +40,7 @@ namespace UlearnGame
 
             SetTimers();
             SetTextBoxes();
-            Setbuttons();
+            SetButtons();
 
             this.KeyDown += GameForm_KeyDown;
         }
@@ -57,10 +58,13 @@ namespace UlearnGame
                     else if (IsGameStarted)
                         UnpauseGame();
                     break;
+                case Keys.Space:
+                    EnqueueRCircle(Center, "feetSmall2");
+                    break;
             }
         }
 
-        private void Setbuttons()
+        private void SetButtons()
         {
             StartButton = new Button();
             StartButton.Text = "START!";
@@ -149,7 +153,7 @@ namespace UlearnGame
             PictureBox.MouseUp += PB_MouseUp;
             PictureBox.MouseMove += PB_MouseMove;
             Controls.Add(PictureBox);
-            game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
+            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
             IsGameStarted = true;
         }
 
@@ -182,10 +186,7 @@ namespace UlearnGame
             if (!game.IsLevelsEnded)
                 Controls.Add(NextLevelButton);
             else
-            {
                 Controls.Add(WinningTextBox);
-            }
-            
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -204,7 +205,7 @@ namespace UlearnGame
             Controls.Clear();
             Controls.Add(PictureBox);
             PaintTimer.Start();
-            game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
+            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -235,21 +236,27 @@ namespace UlearnGame
 
             float x = r.Position.X + Offset.X;
             float y = r.Position.Y + Offset.Y;
-            g.TranslateTransform(x, y);
-            g.RotateTransform(r.FeetAngle);
-            g.TranslateTransform(-x, -y);
-            if (r.IsFeetFlipped)
-                image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            if (image == SmallFeet)
+            {
+                g.TranslateTransform(x, y);
+                g.RotateTransform(r.FeetAngle);
+                g.TranslateTransform(-x, -y);
+                if (r.IsFeetFlipped)
+                    image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            }
             g.DrawImage(image,
                 x - image.Width / 2,
                 y - image.Height / 2,
                 image.Width,
                 image.Height);
-            if (r.IsFeetFlipped)
-                image.RotateFlip(RotateFlipType.RotateNoneFlipX);
-            g.TranslateTransform(x, y);
-            g.RotateTransform(-r.FeetAngle);
-            g.TranslateTransform(-x, -y);
+            if (image == SmallFeet)
+            {
+                if (r.IsFeetFlipped)
+                    image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                g.TranslateTransform(x, y);
+                g.RotateTransform(-r.FeetAngle);
+                g.TranslateTransform(-x, -y);
+            }
         }
 
         private void DrawRay(Graphics g, Ray ray)
@@ -299,13 +306,13 @@ namespace UlearnGame
 
         private void ClickTimer_Tick(object sender, EventArgs e)
         {
-            EnqueueRCircle();
+            EnqueueRCircle(MouseLocation);
         }
 
         private void PB_MouseDown(object sender, MouseEventArgs e)
         {
-            game.MouseLocation = new PointF(e.Location.X, e.Location.Y);
-            EnqueueRCircle();
+            MouseLocation = new PointF(e.Location.X, e.Location.Y);
+            EnqueueRCircle(MouseLocation);
 
             ClickTimer.Start();
             IsMouseDown = true;
@@ -314,7 +321,7 @@ namespace UlearnGame
         private void PB_MouseMove(object sender, MouseEventArgs e)
         {
             if (IsMouseDown)
-                game.MouseLocation = new PointF(e.Location.X, e.Location.Y);
+                MouseLocation = new PointF(e.Location.X, e.Location.Y);
         }
 
         private void PB_MouseUp(object sender, MouseEventArgs e)
@@ -323,14 +330,15 @@ namespace UlearnGame
             ClickTimer.Stop();
         }
 
-        private void EnqueueRCircle()
+        private void EnqueueRCircle(PointF location, string feet = "feetSmall")
         {
             if (!IsStepped)
             {
-                Offset = game.EnqueueNewRayCircle(Center, Offset, IsFeetFlipped);
+                Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, feet);
                 IsFeetFlipped = !IsFeetFlipped;
                 ClickIntervalTimer.Start();
                 IsStepped = true;
+                
             }
         }
     }
