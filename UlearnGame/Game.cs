@@ -5,8 +5,6 @@ using System.IO;
 using Newtonsoft.Json;
 
 //TODO:
-//Tutorial
-//RedSquare
 //Sounds
 
 namespace UlearnGame

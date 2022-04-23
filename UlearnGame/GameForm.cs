@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Media;
 
 namespace UlearnGame
 {
     public partial class GameForm : Form
     {
+        SoundPlayer StepPlayer;
         PointF Center { get; set; }
         PointF Offset { get; set; }
         PointF MouseLocation { get; set; }
         Game game { get; }
         PictureBox PictureBox { get; set; }
-        Label WinningTextBox { get; set; }
+        Label WinningLabel { get; set; }
+        Label TutorialLabel { get; set; }
         Button StartButton { get; set; }
         Button ContinueButton { get; set; }
         Button NextLevelButton { get; set; }
@@ -30,9 +33,11 @@ namespace UlearnGame
 
         public GameForm(Game game)
         {
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.Size = new Size(1920, 1080);
+            //StepPlayer = new SoundPlayer(@"C:\Users\nikit\Downloads\a9.wav");
+            //StepPlayer.Load();
             BackColor = Color.Black;
-            Width = 1600;
-            Height = 900;
             this.game = game;
             StartPosition = FormStartPosition.CenterScreen;
             Center = new PointF(Width / 2, Height / 2);
@@ -41,6 +46,9 @@ namespace UlearnGame
             SetTimers();
             SetTextBoxes();
             SetButtons();
+
+            Controls.Add(StartButton);
+            Controls.Add(ExitButton);
 
             this.KeyDown += GameForm_KeyDown;
         }
@@ -74,9 +82,7 @@ namespace UlearnGame
             StartButton.Location = new Point((int)Center.X - StartButton.Width / 2,
                 (int)Center.Y - 100);
             StartButton.TabStop = false;
-            StartButton.Click += StartGame;
-
-            Controls.Add(StartButton);
+            StartButton.Click += StartGame;            
 
             ExitButton = new Button();
             ExitButton.Text = "EXIT!";
@@ -87,8 +93,6 @@ namespace UlearnGame
                 (int)Center.Y);
             ExitButton.TabStop = false;
             ExitButton.Click += ExitButton_Click;
-
-            Controls.Add(ExitButton);
 
             ContinueButton = new Button();
             ContinueButton.Text = "CONTINUE!";
@@ -113,14 +117,26 @@ namespace UlearnGame
 
         private void SetTextBoxes()
         {
-            WinningTextBox = new Label();
-            WinningTextBox.Text = "YOU ENDED THE GAME!\r\nCONGRATULATIONS!";
-            WinningTextBox.Font = new Font(WinningTextBox.Font.Name, 30);
-            WinningTextBox.ForeColor = Color.White;
-            WinningTextBox.Size = new Size(600, 200);
-            WinningTextBox.Location = new Point((int)Center.X - WinningTextBox.Width / 2,
-                (int)Center.Y - 200);
-            WinningTextBox.TabStop = false;
+            WinningLabel = new Label();
+            WinningLabel.Text =
+                "YOU ENDED THE GAME!\r\n" +
+                "   CONGRATULATIONS!";
+            WinningLabel.Font = new Font(WinningLabel.Font.Name, 30);
+            WinningLabel.ForeColor = Color.White;
+            WinningLabel.Size = new Size(600, 200);
+            WinningLabel.Location = new Point((int)Center.X - WinningLabel.Width / 2 + 50,
+                (int)Center.Y - 120);
+
+            TutorialLabel = new Label();
+            TutorialLabel.Text = 
+                "You are in dark cave! Find the exit!\r\n" + 
+                "Walk on LMB.\r\n" +
+                "If you get stuck, press the spacebar\r\n" +
+                "and the character will clap.";
+            TutorialLabel.Font = new Font(TutorialLabel.Font.Name, 30);
+            TutorialLabel.ForeColor = Color.White;
+            TutorialLabel.AutoSize = true;
+            TutorialLabel.Location = new Point(0, 0);
         }
 
         private void SetTimers()
@@ -152,8 +168,10 @@ namespace UlearnGame
             PictureBox.MouseDown += PB_MouseDown;
             PictureBox.MouseUp += PB_MouseUp;
             PictureBox.MouseMove += PB_MouseMove;
+            Controls.Add(TutorialLabel);
             Controls.Add(PictureBox);
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
+            //StepPlayer.Play();
             IsGameStarted = true;
         }
 
@@ -186,7 +204,7 @@ namespace UlearnGame
             if (!game.IsLevelsEnded)
                 Controls.Add(NextLevelButton);
             else
-                Controls.Add(WinningTextBox);
+                Controls.Add(WinningLabel);
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -206,6 +224,7 @@ namespace UlearnGame
             Controls.Add(PictureBox);
             PaintTimer.Start();
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
+            //StepPlayer.Play();
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -334,11 +353,11 @@ namespace UlearnGame
         {
             if (!IsStepped)
             {
+                //StepPlayer.Play();
                 Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, feet);
                 IsFeetFlipped = !IsFeetFlipped;
                 ClickIntervalTimer.Start();
                 IsStepped = true;
-                
             }
         }
     }
