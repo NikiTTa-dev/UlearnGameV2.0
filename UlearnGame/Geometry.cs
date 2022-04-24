@@ -35,7 +35,7 @@ namespace UlearnGame
             return 2 * Math.Sqrt(p * (p - ab) * (p - bc) * (p - ac)) / ab;
         }
 
-        public static RayDirection GetVectorDirection(Wall wall, Ray ray)
+        public static double GetAlpha(Wall wall, Ray ray)
         {
             double ans;
             if (wall.Last.Y == wall.First.Y)
@@ -47,6 +47,12 @@ namespace UlearnGame
                     (ray.Position.X - wall.Last.X) / (wall.First.X - wall.Last.X)) /
                     (ray.MotionVector.X / (wall.First.X - wall.Last.X) -
                     ray.MotionVector.Y / (wall.First.Y - wall.Last.Y));
+            return ans;
+        }
+
+        public static RayDirection GetVectorDirection(Wall wall, Ray ray)
+        {
+            var ans = GetAlpha(wall, ray);
 
             return ans >= 0 ? RayDirection.ToWall : RayDirection.FromWall;
         }
@@ -55,9 +61,7 @@ namespace UlearnGame
         {
             var denominator = (wall.Last.Y - wall.First.Y) * (p1.X - p2.X) - (wall.Last.X - wall.First.X) * (p1.Y - p2.Y);
             if (denominator == 0)
-            {
-                    return false;
-            }
+                return false;
             else
             {
                 var numerator_a = (wall.Last.X - p2.X) * (wall.Last.Y - wall.First.Y) - (wall.Last.X - wall.First.X) * (wall.Last.Y - p2.Y);
@@ -69,11 +73,6 @@ namespace UlearnGame
                     return true;
                 return false;
             }
-        }
-
-        public static PointF GetNewPointOfWallCrossing(Wall wall, PointF lastPos, PointF newPos)
-        {
-            return newPos;
         }
     }
 }

@@ -7,10 +7,9 @@ using System.Drawing;
 
 namespace UlearnGame
 {
-    interface IGameObject
+    public class Level
     {
-        PointF Position { get; set; }
-        Color ObjectColor { get; set; }
-        int Speed { get; set; }
+        public List<Wall> Walls;
+        public PointF WinningSquarePositon;
     }
 }

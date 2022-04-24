@@ -62,7 +62,7 @@
     </Compile>
     <Compile Include="Geometry.cs" />
     <Compile Include="IGameObject.cs" />
-    <Compile Include="MakeTestScene.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="PointFExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="SomeTests.cs" />
     <Compile Include="Wall.cs" />
+    <Compile Include="WinningScuare.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -106,6 +107,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Pic\feetsmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="a6.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
