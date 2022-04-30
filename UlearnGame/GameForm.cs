@@ -7,6 +7,7 @@ namespace UlearnGame
 {
     public partial class GameForm : Form
     {
+        SoundPlayer ClapPlayer;
         SoundPlayer StepPlayer;
         PointF Center { get; set; }
         PointF Offset { get; set; }
@@ -35,8 +36,10 @@ namespace UlearnGame
         {
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = new Size(1920, 1080);
-            //StepPlayer = new SoundPlayer(@"C:\Users\nikit\Downloads\a9.wav");
-            //StepPlayer.Load();
+            ClapPlayer = new SoundPlayer(@"a6.wav");
+            ClapPlayer.Load();
+            StepPlayer = new SoundPlayer(@"a.wav");
+            StepPlayer.Load();
             BackColor = Color.Black;
             this.game = game;
             StartPosition = FormStartPosition.CenterScreen;
@@ -171,7 +174,7 @@ namespace UlearnGame
             Controls.Add(TutorialLabel);
             Controls.Add(PictureBox);
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
-            //StepPlayer.Play();
+            ClapPlayer.Play();
             IsGameStarted = true;
         }
 
@@ -224,7 +227,7 @@ namespace UlearnGame
             Controls.Add(PictureBox);
             PaintTimer.Start();
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
-            //StepPlayer.Play();
+            ClapPlayer.Play();
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -353,7 +356,7 @@ namespace UlearnGame
         {
             if (!IsStepped)
             {
-                //StepPlayer.Play();
+                StepPlayer.Play();
                 Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, feet);
                 IsFeetFlipped = !IsFeetFlipped;
                 ClickIntervalTimer.Start();
