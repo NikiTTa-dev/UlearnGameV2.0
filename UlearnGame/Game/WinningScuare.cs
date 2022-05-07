@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-
 namespace UlearnGame
 {
     public class WinningScuare : IGameObject

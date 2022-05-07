@@ -4,9 +4,6 @@ using System.Drawing;
 using System.IO;
 using Newtonsoft.Json;
 
-//TODO:
-//Sounds
-
 namespace UlearnGame
 {
     public class Game
@@ -24,7 +21,7 @@ namespace UlearnGame
 
         public Game()
         {
-            Levels = JsonConvert.DeserializeObject<List<Level>>(File.ReadAllText("Levels.json"));
+            Levels = JsonConvert.DeserializeObject<List<Level>>(File.ReadAllText("Resources/Levels.json"));
             Walls = Levels[CurLevel].Walls;
             winningScuare = new WinningScuare(Levels[CurLevel].WinningSquarePositon);
             CharacterRayCircles = new Queue<RayCircle>();
