@@ -88,6 +88,8 @@ namespace UlearnGame
                 foreach (var ray in rayCircle.Rays)
                 {
                     ray.RefreshRay(Walls);
+                    foreach (var rayPart in ray.RayParts)
+                        rayPart.Opacity = (int)(rayPart.Opacity * 0.985);
                     ray.Opacity = (int)(ray.Opacity * 0.985);
                 }
             }

@@ -26,11 +26,6 @@ namespace UlearnGame
 
         }
 
-        public void LengthenRay()
-        {
-            Position = Position.PSumm(MotionVector);
-        }
-
         public void RefreshRay(List<Wall> walls)
         {
             foreach (var wall in walls)
@@ -41,7 +36,7 @@ namespace UlearnGame
                     LastRayPart = new RayPart(LastRayPart, Position, Opacity);
                     RayParts.Enqueue(LastRayPart);
                 }
-            LengthenRay();
+            Position = Position.PSumm(MotionVector);
         }
 
         public void RefreshWinningRays(List<Wall> walls)
