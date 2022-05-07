@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Media;
 
 namespace UlearnGame
 {
     public partial class GameForm : Form
     {
-        SoundPlayer StepPlayer;
         PointF Center { get; set; }
         PointF Offset { get; set; }
         PointF MouseLocation { get; set; }
@@ -22,27 +20,27 @@ namespace UlearnGame
         Timer PaintTimer { get; set; }
         Timer ClickTimer { get; set; }
         Timer ClickIntervalTimer { get; set; }
-        Bitmap SmallFeet { get; } = Resources.feetsmall;
-        Bitmap SmallFeet2 { get; } = Resources.feetsmall2;
+        Bitmap SmallFeet { get; }
+        Bitmap SmallFeet2 { get; }
         bool IsFeetFlipped { get; set; }
         bool IsMouseDown { get; set; }
         bool IsStepped { get; set; }
         bool IsGameStarted { get; set; }
         bool IsGamePaused { get; set; }
-        bool IsWallsVisualized { get; set; } = true;
+        bool IsWallsVisualized { get; set; }
 
         public GameForm(Game game)
         {
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = new Size(1920, 1080);
-            //StepPlayer = new SoundPlayer(@"C:\Users\nikit\Downloads\a9.wav");
-            //StepPlayer.Load();
             BackColor = Color.Black;
             this.game = game;
             StartPosition = FormStartPosition.CenterScreen;
             Center = new PointF(Width / 2, Height / 2);
             Offset = new PointF(0, 0);
 
+            SmallFeet = (Bitmap)Image.FromFile(@"Resources/Pictures/feetsmall.png");
+            SmallFeet2 = (Bitmap)Image.FromFile(@"Resources/Pictures/feetsmall2.png");
             SetTimers();
             SetTextBoxes();
             SetButtons();
@@ -67,7 +65,7 @@ namespace UlearnGame
                         UnpauseGame();
                     break;
                 case Keys.Space:
-                    EnqueueRCircle(Center, "feetSmall2");
+                    EnqueueRCircle(Center, "feetSmall2", Sounds.ClapSound);
                     break;
             }
         }
@@ -171,7 +169,7 @@ namespace UlearnGame
             Controls.Add(TutorialLabel);
             Controls.Add(PictureBox);
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
-            //StepPlayer.Play();
+            Sound.Play(Sounds.ClapSound);
             IsGameStarted = true;
         }
 
@@ -224,7 +222,7 @@ namespace UlearnGame
             Controls.Add(PictureBox);
             PaintTimer.Start();
             game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
-            //StepPlayer.Play();
+            Sound.Play(Sounds.ClapSound);
         }
 
         private void PB_OnPaint(object sender, PaintEventArgs e)
@@ -349,11 +347,11 @@ namespace UlearnGame
             ClickTimer.Stop();
         }
 
-        private void EnqueueRCircle(PointF location, string feet = "feetSmall")
+        private void EnqueueRCircle(PointF location, string feet = "feetSmall", Sounds sound = Sounds.StepSound)
         {
             if (!IsStepped)
             {
-                //StepPlayer.Play();
+                Sound.Play(sound);
                 Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, feet);
                 IsFeetFlipped = !IsFeetFlipped;
                 ClickIntervalTimer.Start();

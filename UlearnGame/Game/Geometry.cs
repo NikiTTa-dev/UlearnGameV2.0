@@ -9,10 +9,15 @@ namespace UlearnGame
 {
     public static class Geometry
     {
-        static readonly Func<double, double, double> GetDistance = (diffX, diffY) =>
-            Math.Sqrt(diffX * diffX + diffY * diffY);
-        static readonly Func<double, double, double, bool> IsObtuse = (double line, double a, double b) =>
-            (a * a + b * b - line * line) / (2 * a * b) < 0;
+        static double GetDistance(double diffX, double diffY)
+        {
+            return Math.Sqrt(diffX * diffX + diffY * diffY);
+        }
+
+        static bool IsObtuse(double line, double a, double b)
+        {
+            return (a * a + b * b - line * line) / (2 * a * b) < 0;
+        }
 
         public static PointF GetCollisionVector(Wall wall, Ray ray)
         {
@@ -30,8 +35,8 @@ namespace UlearnGame
             double bc = GetDistance(point.X - wall.Last.X, point.Y - wall.Last.Y);
             if (IsObtuse(ac, bc, ab)) return bc;
             if (IsObtuse(bc, ac, ab)) return ac;
-
             double p = (ac + bc + ab) / 2;
+
             return 2 * Math.Sqrt(p * (p - ab) * (p - bc) * (p - ac)) / ab;
         }
 
@@ -53,7 +58,6 @@ namespace UlearnGame
         public static RayDirection GetVectorDirection(Wall wall, Ray ray)
         {
             var ans = GetAlpha(wall, ray);
-
             return ans >= 0 ? RayDirection.ToWall : RayDirection.FromWall;
         }
 
