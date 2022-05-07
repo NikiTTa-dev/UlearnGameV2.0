@@ -27,7 +27,7 @@ namespace UlearnGame
         bool IsStepped { get; set; }
         bool IsGameStarted { get; set; }
         bool IsGamePaused { get; set; }
-        bool IsWallsVisualized { get; set; } = true;
+        bool IsWallsVisualized { get; set; }
 
         public GameForm(Game game)
         {

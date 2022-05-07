@@ -23,7 +23,6 @@ namespace UlearnGame
             RayParts = new Queue<RayPart>();
             LastRayPart = new RayPart(null, pos, Opacity);
             RayParts.Enqueue(LastRayPart);
-
         }
 
         public void RefreshRay(List<Wall> walls)
