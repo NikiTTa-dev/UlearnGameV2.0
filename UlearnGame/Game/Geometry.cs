@@ -9,12 +9,12 @@ namespace UlearnGame
 {
     public static class Geometry
     {
-        static double GetDistance(double diffX, double diffY)
+        private static double GetDistance(double diffX, double diffY)
         {
             return Math.Sqrt(diffX * diffX + diffY * diffY);
         }
 
-        static bool IsObtuse(double line, double a, double b)
+        private static bool IsObtuse(double line, double a, double b)
         {
             return (a * a + b * b - line * line) / (2 * a * b) < 0;
         }
@@ -40,7 +40,7 @@ namespace UlearnGame
             return 2 * Math.Sqrt(p * (p - ab) * (p - bc) * (p - ac)) / ab;
         }
 
-        public static double GetAlpha(Wall wall, Ray ray)
+        private static double GetAlpha(Wall wall, Ray ray)
         {
             double ans;
             if (wall.Last.Y == wall.First.Y)
