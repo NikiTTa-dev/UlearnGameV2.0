@@ -42,7 +42,7 @@ namespace UlearnGame
             SmallFeet = (Bitmap)Image.FromFile(@"Resources/Pictures/feetsmall.png");
             SmallFeet2 = (Bitmap)Image.FromFile(@"Resources/Pictures/feetsmall2.png");
             SetTimers();
-            SetTextBoxes();
+            SetLabels();
             SetButtons();
 
             Controls.Add(StartButton);
@@ -80,7 +80,7 @@ namespace UlearnGame
             StartButton.Location = new Point((int)Center.X - StartButton.Width / 2,
                 (int)Center.Y - 100);
             StartButton.TabStop = false;
-            StartButton.Click += StartGame;            
+            StartButton.Click += StartGame;
 
             ExitButton = new Button();
             ExitButton.Text = "EXIT!";
@@ -113,7 +113,7 @@ namespace UlearnGame
             NextLevelButton.Click += NextLevelButton_Click;
         }
 
-        private void SetTextBoxes()
+        private void SetLabels()
         {
             WinningLabel = new Label();
             WinningLabel.Text =
@@ -126,15 +126,15 @@ namespace UlearnGame
                 (int)Center.Y - 120);
 
             TutorialLabel = new Label();
-            TutorialLabel.Text = 
-                "You are in dark cave! Find the exit!\r\n" + 
-                "Walk on LMB.\r\n" +
+            TutorialLabel.Text =
+                " You are in dark cave! Find the exit!\r\n" +
+                "                 Walk on LMB.\r\n" +
                 "If you get stuck, press the spacebar\r\n" +
-                "and the character will clap.";
+                "           and character will clap.";
             TutorialLabel.Font = new Font(TutorialLabel.Font.Name, 30);
             TutorialLabel.ForeColor = Color.White;
             TutorialLabel.AutoSize = true;
-            TutorialLabel.Location = new Point(0, 0);
+            TutorialLabel.Location = new Point((int)Center.X, (int)(Center.Y - 300));
         }
 
         private void SetTimers()
@@ -168,19 +168,9 @@ namespace UlearnGame
             PictureBox.MouseMove += PB_MouseMove;
             Controls.Add(TutorialLabel);
             Controls.Add(PictureBox);
-            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
+            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
             Sound.Play(Sounds.ClapSound);
             IsGameStarted = true;
-        }
-
-        private void UnpauseGame()
-        {
-            Controls.Clear();
-            Controls.Add(PictureBox);
-            IsGamePaused = false;
-            PaintTimer.Start();
-            foreach (var rayCircle in game.CharacterRayCircles)
-                rayCircle.DestroyTimer.Start();
         }
 
         private void PauseGame()
@@ -192,6 +182,16 @@ namespace UlearnGame
             Controls.Add(ExitButton);
             Controls.Add(ContinueButton);
             IsGamePaused = true;
+        }
+
+        private void UnpauseGame()
+        {
+            Controls.Clear();
+            Controls.Add(PictureBox);
+            IsGamePaused = false;
+            PaintTimer.Start();
+            foreach (var rayCircle in game.CharacterRayCircles)
+                rayCircle.DestroyTimer.Start();
         }
 
         private void ShowWinningScreen()
@@ -221,7 +221,7 @@ namespace UlearnGame
             Controls.Clear();
             Controls.Add(PictureBox);
             PaintTimer.Start();
-            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped);
+            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
             Sound.Play(Sounds.ClapSound);
         }
 
@@ -351,11 +351,16 @@ namespace UlearnGame
         {
             if (!IsStepped)
             {
-                Sound.Play(sound);
-                Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, feet);
-                IsFeetFlipped = !IsFeetFlipped;
-                ClickIntervalTimer.Start();
-                IsStepped = true;
+                Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, out bool isEnqueued, feet);
+                if (isEnqueued)
+                {
+                    if (game.CurLevel == 0)
+                        TutorialLabel.Location = new Point((int)(Center.X + Offset.X), (int)(Center.Y - 300 + Offset.Y));
+                    Sound.Play(sound);
+                    IsFeetFlipped = !IsFeetFlipped;
+                    ClickIntervalTimer.Start();
+                    IsStepped = true;
+                }
             }
         }
     }

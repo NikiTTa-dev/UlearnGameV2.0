@@ -1,92 +1,68 @@
 ﻿using NUnit.Framework;
 using System.Drawing;
-using System.Diagnostics;
+using System.Linq;
 
 namespace UlearnGame
 {
     [TestFixture]
     public class SomeTests
     {
-        Wall wall;
-        Ray ray;
-        Ray ray2;
-        PointF p1;
-        PointF p2;
-        PointF p3;
-        PointF p4;
-        PointF p5;
+        Wall[] Walls;
+        PointF[] Points;
+        Ray[] rays;
 
-        public SomeTests()
+        [SetUp]
+        public void SetUp()
         {
-            wall = new Wall(new PointF(0, 100), new PointF(100, 0));
-            ray = new Ray(5, new PointF(1, 1), new PointF(5, 5), Color.White);
-            ray2 = new Ray(5, new PointF(6, 6), new PointF(-5, -5), Color.White);
-            p1 = new PointF(0, 0);
-            p2 = new PointF(300, 300);
-            p3 = new PointF(20, 20);
-            p4 = new PointF(0, 99);
-            p5 = new PointF(99, 0);
+            Walls = new Wall[] {
+                new Wall (new PointF(0, 100), new PointF(100, 0))
+            };
+            rays = new Ray[] {
+                new Ray(5, new PointF(1, 1), new PointF(5, 5), Color.White),
+                new Ray(5, new PointF(6, 6), new PointF(-5, -5), Color.White),
+                new Ray(5, new PointF(200, 200), new PointF(10,1), Color.White)
+            };
+            Points = new PointF[] {
+                new PointF(0, 0),
+                new PointF(300, 300),
+                new PointF(20, 20),
+                new PointF(0, 99),
+                new PointF(99, 0)
+            };
         }
 
         [Test]
-        public void First()
+        public void GetCollisionVectorTests()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1000000; i++)
-            {
-                var d1 = Geometry.GetDistanceToSegment(wall, ray.Position);
-                var d2 = Geometry.GetDistanceToSegment(wall, ray.Position.PSumm(ray.MotionVector));
-                Assert.IsTrue(d2 < d1);
-                d1 = Geometry.GetDistanceToSegment(wall, ray2.Position);
-                d2 = Geometry.GetDistanceToSegment(wall, ray2.Position.PSumm(ray2.MotionVector));
-                Assert.IsTrue(d2 > d1);
-            }
-
-            sw.Stop();
-            var a = sw.ElapsedMilliseconds;
+            var testRes = Geometry.GetCollisionVector(Walls[0], rays[0]);
+            Assert.AreEqual(-3.535534, testRes.X, 10e-5);
+            Assert.AreEqual(-3.535534, testRes.Y, 10e-5);
         }
 
-        [Test]
-        public void Second()
+        [TestCase(false, 0)]
+        [TestCase(true, 1)]
+        [TestCase(true, 2)]
+        public void GetVectorDirectionTests(bool testExpected, int rayIndex)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1000000; i++)
-            {
-                var yo = ray.Position.Y;
-                var xo = ray.Position.X;
-                var yA = wall.First.Y;
-                var xA = wall.First.X;
-                var yB = wall.Last.Y;
-                var xB = wall.Last.X;
-                var xa = ray.MotionVector.X;
-                var ya = ray.MotionVector.Y;
-
-                var L = ((yo - yA) / (yB - yA) - (xo - xA) / (xB - xA)) / ((xa) / (xB - xA) - (ya) / (yB - yA));
-
-                Assert.IsTrue(L > 0);
-
-                yo = ray2.Position.Y;
-                xo = ray2.Position.X;
-                xa = ray2.MotionVector.X;
-                ya = ray2.MotionVector.Y;
-
-                L = ((yo - yA) / (yB - yA) - (xo - xA) / (xB - xA)) / ((xa) / (xB - xA) - (ya) / (yB - yA));
-
-                Assert.IsTrue(L < 0);
-            }
-
-            sw.Stop();
-            var a = sw.ElapsedMilliseconds;
+            Assert.AreEqual(testExpected, Geometry.GetVectorDirection(Walls[0], rays[rayIndex]) == RayDirection.FromWall);
         }
 
-        [Test]
-        public void LineCrossTest()
+        [TestCase(true, 0)]
+        [TestCase(false, 1)]
+        [TestCase(false, 2)]
+        public void GetDistanceTests(bool testExpected, int rayIndex)
         {
-            Assert.IsTrue(Geometry.IsLineCrossed(wall, p1, p2));
-            Assert.IsFalse(Geometry.IsLineCrossed(wall, p1, p3));
-            Assert.IsFalse(Geometry.IsLineCrossed(wall, p4, p5));
+            var d1 = Geometry.GetDistanceToSegment(Walls[0], rays[rayIndex].Position);
+            var d2 = Geometry.GetDistanceToSegment(Walls[0], rays[rayIndex].Position.PSumm(rays[rayIndex].MotionVector));
+            Assert.AreEqual(testExpected, d1 > d2);
+        }
+
+        [TestCase(true, 0, 1)]
+        [TestCase(false, 0, 2)]
+        [TestCase(false, 3, 4)]
+        public void LineCrossTest(bool testExpected, int firstPIndex, int secondePIndex)
+        {
+            Assert.AreEqual(testExpected, Geometry.IsLineCrossed(Walls[0], Points[firstPIndex], Points[secondePIndex]));
         }
     }
 }

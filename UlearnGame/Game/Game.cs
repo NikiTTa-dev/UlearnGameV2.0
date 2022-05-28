@@ -8,7 +8,7 @@ namespace UlearnGame
 {
     public class Game
     {
-        private int CurLevel = 0;
+        public int CurLevel { get; set; } = 0;
         private List<Level> Levels;
         public Queue<RayCircle> CharacterRayCircles { get; set; }
         public WinningScuare winningScuare { get; set; }
@@ -27,8 +27,10 @@ namespace UlearnGame
             CharacterRayCircles = new Queue<RayCircle>();
         }
 
-        public PointF EnqueueNewRayCircle(PointF location, PointF center, PointF offset, bool feetFlip, string feet = "feetSmall")
+        public PointF EnqueueNewRayCircle(PointF location, PointF center,
+            PointF offset, bool feetFlip, out bool isEnqueued, string feet = "feetSmall")
         {
+            isEnqueued = true;
             if (LastCirclePosition.IsEmpty)
             {
                 LastCirclePosition = center;
@@ -54,7 +56,11 @@ namespace UlearnGame
             foreach (var wall in Walls)
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) ||
                     Geometry.GetDistanceToSegment(wall, position) < CloseToWallDistance)
+                {
+                    isEnqueued = false;
                     return offset;
+                }
+                    
 
             var resOff = offset.PDiff(diff);
             var angleInDegrees = (float)(angle / Math.PI * 180) + 90;
