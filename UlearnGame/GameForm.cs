@@ -9,8 +9,8 @@ namespace UlearnGame
         PointF Center { get; set; }
         PointF Offset { get; set; }
         PointF MouseLocation { get; set; }
-        Game game { get; }
-        PictureBox PictureBox { get; set; }
+        Game GameModel { get; }
+        PictureBox GamePictureBox { get; set; }
         Label WinningLabel { get; set; }
         Label TutorialLabel { get; set; }
         Button StartButton { get; set; }
@@ -29,12 +29,12 @@ namespace UlearnGame
         bool IsGamePaused { get; set; }
         bool IsWallsVisualized { get; set; }
 
-        public GameForm(Game game)
+        public GameForm(Game gameModel)
         {
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = new Size(1920, 1080);
             BackColor = Color.Black;
-            this.game = game;
+            this.GameModel = gameModel;
             StartPosition = FormStartPosition.CenterScreen;
             Center = new PointF(Width / 2, Height / 2);
             Offset = new PointF(0, 0);
@@ -155,20 +155,20 @@ namespace UlearnGame
         private void StartGame(object sender, EventArgs e)
         {
             Controls.Clear();
-            PictureBox = new PictureBox
+            GamePictureBox = new PictureBox
             {
                 Location = new Point(0, 0),
                 Width = this.Width,
                 Height = this.Height
             };
-            PictureBox.Paint += PB_OnPaint;
+            GamePictureBox.Paint += PB_OnPaint;
             PaintTimer.Start();
-            PictureBox.MouseDown += PB_MouseDown;
-            PictureBox.MouseUp += PB_MouseUp;
-            PictureBox.MouseMove += PB_MouseMove;
+            GamePictureBox.MouseDown += PB_MouseDown;
+            GamePictureBox.MouseUp += PB_MouseUp;
+            GamePictureBox.MouseMove += PB_MouseMove;
             Controls.Add(TutorialLabel);
-            Controls.Add(PictureBox);
-            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
+            Controls.Add(GamePictureBox);
+            GameModel.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
             Sound.Play(Sounds.ClapSound);
             IsGameStarted = true;
         }
@@ -177,7 +177,7 @@ namespace UlearnGame
         {
             Controls.Clear();
             PaintTimer.Stop();
-            foreach (var rayCircle in game.CharacterRayCircles)
+            foreach (var rayCircle in GameModel.CharacterRayCircles)
                 rayCircle.DestroyTimer.Stop();
             Controls.Add(ExitButton);
             Controls.Add(ContinueButton);
@@ -187,10 +187,10 @@ namespace UlearnGame
         private void UnpauseGame()
         {
             Controls.Clear();
-            Controls.Add(PictureBox);
+            Controls.Add(GamePictureBox);
             IsGamePaused = false;
             PaintTimer.Start();
-            foreach (var rayCircle in game.CharacterRayCircles)
+            foreach (var rayCircle in GameModel.CharacterRayCircles)
                 rayCircle.DestroyTimer.Start();
         }
 
@@ -199,7 +199,7 @@ namespace UlearnGame
             Controls.Clear();
             PaintTimer.Stop();
             Controls.Add(ExitButton);
-            if (!game.IsLevelsEnded)
+            if (!GameModel.IsLevelsEnded)
                 Controls.Add(NextLevelButton);
             else
                 Controls.Add(WinningLabel);
@@ -217,11 +217,11 @@ namespace UlearnGame
 
         private void NextLevelButton_Click(object sender, EventArgs e)
         {
-            game.IsGameWon = false;
+            GameModel.IsGameWon = false;
             Controls.Clear();
-            Controls.Add(PictureBox);
+            Controls.Add(GamePictureBox);
             PaintTimer.Start();
-            game.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
+            GameModel.EnqueueNewRayCircle(Center, Center, Offset, IsFeetFlipped, out bool isEnququed);
             Sound.Play(Sounds.ClapSound);
         }
 
@@ -230,13 +230,13 @@ namespace UlearnGame
             Graphics g = e.Graphics;
             if (IsGameStarted)
             {
-                foreach (var rayCircle in game.CharacterRayCircles)
+                foreach (var rayCircle in GameModel.CharacterRayCircles)
                 {
                     foreach (var ray in rayCircle.Rays)
                         DrawRay(g, ray);
                     DrawFeet(g, rayCircle);
                 }
-                foreach (var ray in game.winningScuare.Rays)
+                foreach (var ray in GameModel.winningScuare.Rays)
                     DrawRay(g, ray);
                 if (IsWallsVisualized)
                     VisualizeWalls(g);
@@ -296,16 +296,16 @@ namespace UlearnGame
 
         private void VisualizeWalls(Graphics g)
         {
-            foreach (var wall in game.Walls)
+            foreach (var wall in GameModel.Walls)
                 g.DrawLine(new Pen(Color.Red, 2), wall.First.PSumm(Offset), wall.Last.PSumm(Offset));
         }
 
         private void PaintTimer_Tick(object sender, EventArgs e)
         {
-            if (!game.IsGameWon)
+            if (!GameModel.IsGameWon)
             {
-                game.Refresh();
-                PictureBox.Invalidate();
+                GameModel.Refresh();
+                GamePictureBox.Invalidate();
             }
             else
             {
@@ -351,10 +351,10 @@ namespace UlearnGame
         {
             if (!IsStepped)
             {
-                Offset = game.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, out bool isEnqueued, feet);
+                Offset = GameModel.EnqueueNewRayCircle(location, Center, Offset, IsFeetFlipped, out bool isEnqueued, feet);
                 if (isEnqueued)
                 {
-                    if (game.CurLevel == 0)
+                    if (GameModel.CurLevel == 0)
                         TutorialLabel.Location = new Point((int)(Center.X + Offset.X), (int)(Center.Y - 300 + Offset.Y));
                     Sound.Play(sound);
                     IsFeetFlipped = !IsFeetFlipped;

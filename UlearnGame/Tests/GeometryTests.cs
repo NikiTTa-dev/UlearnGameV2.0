@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
 using System.Drawing;
-using System.Linq;
+using System;
 
 namespace UlearnGame
 {
     [TestFixture]
-    public class SomeTests
+    public class GeometryTests
     {
         Wall[] Walls;
         PointF[] Points;

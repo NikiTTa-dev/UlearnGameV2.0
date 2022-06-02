@@ -9,6 +9,7 @@ namespace UlearnGame
     public class Game
     {
         public int CurLevel { get; set; } = 0;
+        private string LevelsPath;
         private List<Level> Levels;
         public Queue<RayCircle> CharacterRayCircles { get; set; }
         public WinningScuare winningScuare { get; set; }
@@ -19,9 +20,14 @@ namespace UlearnGame
         public PointF LastCirclePosition { get; set; }
         private int CloseToWallDistance { get; set; } = 30;
 
-        public Game()
+        public Game(string pathToLevels = "./Resources/Levels.json")
         {
-            Levels = JsonConvert.DeserializeObject<List<Level>>(File.ReadAllText("Resources/Levels.json"));
+            LevelsPath = pathToLevels;
+            try
+            {
+                Levels = JsonConvert.DeserializeObject<List<Level>>(File.ReadAllText(LevelsPath));
+            }
+            catch (Exception ex) { throw new FileNotFoundException(ex.Message); }
             Walls = Levels[CurLevel].Walls;
             winningScuare = new WinningScuare(Levels[CurLevel].WinningSquarePositon);
             CharacterRayCircles = new Queue<RayCircle>();
@@ -51,8 +57,12 @@ namespace UlearnGame
             var position = LastCirclePosition.PSumm(diff);
             foreach (var wall in winningScuare.Walls)
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position))
+                {
                     WinLevel();
-                
+                    return offset;
+                }
+                    
+
             foreach (var wall in Walls)
                 if (Geometry.IsLineCrossed(wall, LastCirclePosition, position) ||
                     Geometry.GetDistanceToSegment(wall, position) < CloseToWallDistance)
@@ -60,7 +70,6 @@ namespace UlearnGame
                     isEnqueued = false;
                     return offset;
                 }
-                    
 
             var resOff = offset.PDiff(diff);
             var angleInDegrees = (float)(angle / Math.PI * 180) + 90;
@@ -79,7 +88,7 @@ namespace UlearnGame
             {
                 CurLevel = 0;
                 IsLevelsEnded = true;
-            } 
+            }
             Walls = Levels[CurLevel].Walls;
             winningScuare = new WinningScuare(Levels[CurLevel].WinningSquarePositon);
             foreach (var rayCircle in CharacterRayCircles)
